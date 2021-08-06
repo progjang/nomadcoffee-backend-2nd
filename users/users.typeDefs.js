@@ -17,20 +17,4 @@ export default gql`
         seeProfile(username:String!): User
     },
 
-    type ResolveResult{
-        ok: Boolean!,
-        error: String
-    },
-
-    type Mutation{
-        createAccount(
-            username: String!
-            email: String!
-            name: String!
-            password: String!
-            location: String
-            avatarURL: String
-            githubUsername: String
-        ): ResolveResult!
-    }
 `;
