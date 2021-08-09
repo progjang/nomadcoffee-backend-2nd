@@ -1,30 +1,39 @@
 import jwt from "jsonwebtoken";
 import client from "../client"
 
+export const checkUser = async (username) => {
+    return await client.user.findUnique({
+        where: {
+            username,
+        },
+        select: {
+            id: true,
+        },
+    });
+}
 
 export const getUser = async(token) => {
     try {
         if(!token){
             return null;
         }
-        const {id} = await jwt.verify(token, process.env.SECRET_KEY);
-        console.log("getUser id is " + id);
 
+        const decoded = await jwt.verify(token, process.env.SECRET_KEY);
         const verifiedUser = await client.user.findFirst({
             where: {
-                id
+                id: decoded.id,
             }
         });
         if(!verifiedUser){
             return null;
         } else{
-            console.log("444");
             return verifiedUser;
         }
-    } catch {
-        console.log("555");
+    } catch(err) {
+        console.log(err);
         return null;
     }
+
 };
 
 export const protectedResolver = (ourResolver) => (

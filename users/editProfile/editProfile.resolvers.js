@@ -4,15 +4,14 @@ import client from "../../client";
 import { protectedResolver } from "../users.utils";
 
 const resolverFn = async(_, {username, email, name, location, avatar, githubUsername, password:newPassword}, {loggedInUser}) => {
-    console.log(loggedInUser);
-    let avatarUrl = null;
+    let avatarURL = null;
     if(avatar){
         const {filename, createReadStream} = await avatar;
         const newFilename = `${loggedInUser.id}-${Date.now()}-${filename}`;
         const readStream = createReadStream();
         const writeStream = createWriteStream(process.cwd() + "/uploads/" + newFilename);
         readStream.pipe(writeStream);
-        avatarUrl = `http://localhost:4000/static/${newFilename}`;
+        avatarURL = `http://localhost:4000/static/${newFilename}`;
     }
 
     let uglyPassword = null;
@@ -30,7 +29,7 @@ const resolverFn = async(_, {username, email, name, location, avatar, githubUser
             location,
             githubUsername,
             ...(uglyPassword && {password : uglyPassword}),
-            ...(avatarUrl && {avatarURL: avatarUrl})
+            ...(avatarURL && {avatarURL})
         },
     });
     if(updatedUser.id){

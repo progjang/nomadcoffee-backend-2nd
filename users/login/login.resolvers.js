@@ -10,7 +10,7 @@ export default {
                     username,
                 },
             });
-            console.log(user.id);
+            console.log("user.id: " + user.id);
             if(!user.id){
                 return {
                     ok: false,
@@ -24,7 +24,8 @@ export default {
                     error: "Incorrect password",
                 }
             }
-            const token = await jwt.sign({id: user.id}, process.env.SECRET_KEY);
+            const token = await jwt.sign({ id: user.id }, process.env.SECRET_KEY);
+            console.log("generated:" + token);
             return {
                 ok: true,
                 token,
