@@ -2,21 +2,31 @@ import client from "../../client";
 import { protectedResolver } from "../../users/users.utils";
 import { createWriteStream } from "fs";
 
+const handlePhotos = (photos, id) =>  {
+    let urlList = [];
+    photos.map(async (photo) => {
+        const {filename, createReadStream} = await photo;
+        const newFilename = `${id}-${Date.now()}-${filename}`;
+        const readStream = createReadStream();
+        const writeStream = createWriteStream(process.cwd() + "/uploads/" + newFilename);
+        readStream.pipe(writeStream);
+        const url = `http://localhost:4000/static/${newFilename}`;
+        urlList.push(url);
+    });
+    return urlList;
+}
+
 const createShopResolverFn = async (_, 
     {name, latitude, longitude, categories, photos}, 
     {loggedInUser}) => {
     
     let photosObj = [];
     if(photos){
-        photos.map(async (photo) => {
-            const {filename, createReadStream} = await photo;
-            const newFilename = `${loggedInUser.id}-${Date.now()}-${filename}`;
-            const readStream = createReadStream();
-            const writeStream = createWriteStream(process.cwd() + "/uploads/" + newFilename);
-            readStream.pipe(writeStream);
-            const url = `http://localhost:4000/static/${newFilename}`;
-            photosObj.push({ where: {url: url}, create: {url: url}, });
-        });
+        const listPhotoURL = await handlePhotos(photos, loggedInUser.id)
+        console.log(listPhotoURL);
+        photosObj = listPhotoURL.map((url) => ({
+            where: {url}, create:{url}
+        }));
     }
 
     let categoriesObj = [];
