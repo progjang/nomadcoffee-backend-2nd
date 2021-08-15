@@ -5,6 +5,8 @@ export default gql`
         id: Int!
         url: String!
         shop: CoffeeShop!
+        createdAt: String!
+        updatedAt: String!
     },
 
     type CoffeeShop {
@@ -12,16 +14,20 @@ export default gql`
         name: String!
         latitude: String
         longitude: String
-        user: User
-        photos: [CoffeeShopPhoto]
-        categories: [Category]
+        user: User!
+        photos(lastId: Int): [CoffeeShopPhoto]
+        categories(lastId: Int): [Category]
+        createdAt: String!
+        updatedAt: String!
     },
     
     type Category {
         id: Int!
         name: String!
         slug: String
-        shops: [CoffeeShop]
+        shops(lastId:Int): [CoffeeShop]
         totalShops: Int
+        createdAt: String!
+        updatedAt: String!
     }
 `;

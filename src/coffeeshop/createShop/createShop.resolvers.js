@@ -1,20 +1,6 @@
 import client from "../../client";
 import { protectedResolver } from "../../users/users.utils";
-import { createWriteStream } from "fs";
-
-const handlePhotos = (photos, id) =>  {
-    let urlList = [];
-    photos.map(async (photo) => {
-        const {filename, createReadStream} = await photo;
-        const newFilename = `${id}-${Date.now()}-${filename}`;
-        const readStream = createReadStream();
-        const writeStream = createWriteStream(process.cwd() + "/uploads/" + newFilename);
-        readStream.pipe(writeStream);
-        const url = `http://localhost:4000/static/${newFilename}`;
-        urlList.push(url);
-    });
-    return urlList;
-}
+import { handlePhoto, processCategory } from "../../utils";
 
 const createShopResolverFn = async (_, 
     {name, latitude, longitude, categories, photos}, 
@@ -22,24 +8,17 @@ const createShopResolverFn = async (_,
     
     let photosObj = [];
     if(photos){
-        const listPhotoURL = await handlePhotos(photos, loggedInUser.id)
-        console.log(listPhotoURL);
-        photosObj = listPhotoURL.map((url) => ({
+        const urlList = await handlePhoto(photos, loggedInUser.id)
+        urlList.map((url) => photosObj.push({
             where: {url}, create:{url}
         }));
     }
+    console.log(photosObj);
 
     let categoriesObj = [];
     if (categories) {
-        const listCategory = categories.split(",").map(item => item.trim());
-        categoriesObj = listCategory.map(category => ({
-            where: { name: category },
-            create: { name: category }
-        }));
+        categoriesObj = processCategory(categories)
     }
-
-    console.log(photosObj);
-    console.log(categoriesObj);
 
     return client.coffeeShop.create({
         data: {
