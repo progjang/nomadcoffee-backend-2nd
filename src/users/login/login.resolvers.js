@@ -10,8 +10,8 @@ export default {
                     username,
                 },
             });
-            console.log("user.id: " + user.id);
-            if(!user.id){
+
+            if(!user){
                 return {
                     ok: false,
                     error: "User not found."
@@ -25,7 +25,6 @@ export default {
                 }
             }
             const token = await jwt.sign({ id: user.id }, process.env.SECRET_KEY);
-            console.log("generated:" + token);
             return {
                 ok: true,
                 token,
